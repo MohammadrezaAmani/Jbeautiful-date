@@ -1,70 +1,10 @@
-from jbeautiful_date.jbeautiful_date import (
-    BeautifulDate,
-    D,
-    MDY,
-    DMY,
-    M,
-    Far,
-    Ord,
-    Kho,
-    Tir,
-    Mor,
-    Sha,
-    Meh,
-    Aba,
-    Aza,
-    Dey,
-    Bah,
-    Esf,
-    Farvardin,
-    Ordibehesht,
-    Khordad,
-    Tir,
-    Mordad,
-    Shahrivar,
-    Mehr,
-    Aban,
-    Azar,
-    Dey,
-    Bahman,
-    Esfand,
-)
+from jbeautiful_date.jbeautiful_date import JBeautifulDate, \
+    D, MDY, DMY, \
+    Far, Ord, Khr, Tir, Mor, Sha, Mehr, Aban, Azar, Dey, Bah, Esf 
 
-#! complete this section!
-
-# from jbeautiful_date.jbeautiful_timedelta import (
-#     years,
-#     months,
-#     weeks,
-#     days,
-#     hours,
-#     minutes,
-#     seconds,
-#     microseconds,
-#     leapday,
-#     year,
-#     month,
-#     day,
-#     hour,
-#     minute,
-#     second,
-#     microsecond,
-#     yearday,
-#     nlyearday,
-#     Do,
-#     Se,
-#     Ch,
-#     Pa,
-#     Jo,
-#     Sh,
-#     Ye,
-#     Doshanbe,
-#     Seshanbe,
-#     Chaharshanbe,
-#     Pajshanbe,
-#     Jomea,
-#     Shanbe,
-#     Yekshanbe,
-# )
+from jbeautiful_date.jbeautiful_timedelta import \
+    years, months, weeks, days, hours, minutes, seconds, microseconds, leapday, \
+    year, month, day, hour, minute, second, microsecond, yearday, nlyearday, \
+   DO, SE, CH, PA, JO, SH, YE
 
 from jbeautiful_date.date_range import drange

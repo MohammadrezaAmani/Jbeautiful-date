@@ -1,6 +1,7 @@
-from datetime import date, datetime
+from jdatetime import date, datetime
 
-from jbeautiful_date import BeautifulDate, days
+from .jbeautiful_date import JBeautifulDate
+from jbeautiful_date.jbeautiful_timedelta import days
 
 
 def timedelta_is_negative(td):
@@ -29,7 +30,7 @@ class drange:  # noqa: N801
                 start = datetime.now()
             else:
                 now = date.today()
-                start = BeautifulDate(now.year, now.month, now.day)
+                start = JBeautifulDate(now.year, now.month, now.day)
 
             stop = start_or_stop
         else:

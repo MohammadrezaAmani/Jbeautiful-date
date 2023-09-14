@@ -1,7 +1,7 @@
 from jdatetime import date, datetime
 
 
-class BeautifulDate(date):
+class JBeautifulDate(date):
     """Date object that can be extended to datetime by using Python indexing/slicing:
 
     Examples:
@@ -29,31 +29,34 @@ class BeautifulDate(date):
         elif isinstance(t, int):
             h, m, s = t, 0, 0
         else:
-            raise TypeError(
-                "Time values must be integer or slice, not {!r}".format(
-                    t.__class__.__name__
-                )
-            )
+            raise TypeError("Time values must be integer or slice, not {!r}".format(t.__class__.__name__))
 
         return datetime(self.year, self.month, self.day, hour=h, minute=m, second=s)
 
     def to_date(self):
         """
-        Converts BeautifulDate to a simple Python date
+        Converts JBeautifulDate to a simple Python date
         :return: date object
         """
         return date(self.year, self.month, self.day)
 
+    def __add__(self, timedelta):
+        return datetime.fromgregorian(date=self.to_date() + timedelta)
+
+    __radd__ = __add__
+# Classes to build date
+#   D @ 16/10/1995 (16/Oct/1995)
+#   D @ 5/19/2006 (May/19/2006)
 
 class _PartialDate:
     """Date builder that uses operator "/" or "-" between values of day, month and year
 
     Examples:
-        >>> D @ 11/12/2000
-        BeautifulDate(2000, 12, 11)
+        >>> D @ 17/10/1380
+        JBeautifulDate(1380, 10, 17)
 
-        >>> D @ 22-10-2000
-        BeautifulDate(2000, 10, 22)
+        >>> D @ 17-10-1380
+        JBeautifulDate(1380, 10, 17)
     """
 
     def __init__(self, first, _format):
@@ -63,17 +66,11 @@ class _PartialDate:
     def __truediv__(self, value):
         self._date_values.append(value)
         if len(self._date_values) == 3:
-            return BeautifulDate(**dict(zip(self._format, self._date_values)))
+            return JBeautifulDate(**dict(zip(self._format, self._date_values)))
         else:
             return self
 
     __sub__ = __truediv__
-
-    def __str__(self):
-        return "/".join(str(v) for v in self._date_values)
-
-    def __repr__(self):
-        return "{}({})".format(self.__class__.__name__, self.__str__())
 
 
 class BaseDateFormat:
@@ -89,56 +86,60 @@ class BaseDateFormat:
         _PartialDate(22/10)
     """
 
-    # List of strings 'day', 'month', and 'year' in desired Deyer.
+    # List of strings 'day', 'month', and 'year' in desired order.
     # Should be overridden in the inherited classes
     _format = None
 
     def __matmul__(self, first):
         return _PartialDate(first, self._format)
 
-    def __str__(self):
-        return "{}{}".format(self.__class__.__name__, self._format)
+    def __repr__(self):
+        return '{}{}'.format(self.__class__.__name__, self._format)
 
     @staticmethod
     def today():
         today = date.today()
-        return BeautifulDate(year=today.year, month=today.month, day=today.day)
+        return JBeautifulDate(year=today.year, month=today.month, day=today.day)
 
     @staticmethod
-    def now():
-        return datetime.now()
+    def now(tz=None):
+        return datetime.now(tz=tz)
 
 
 class DMY(BaseDateFormat):
-    _format = "day", "month", "year"
+    _format = 'day', 'month', 'year'
 
 
 class MDY(BaseDateFormat):
-    _format = "month", "day", "year"
+    _format = 'month', 'day', 'year'
 
 
 class YMD(BaseDateFormat):
-    _format = "year", "month", "day"
+    _format = 'year', 'month', 'day'
 
 
 class YDM(BaseDateFormat):
-    _format = "year", "day", "month"
+    _format = 'year', 'day', 'month'
 
 
 D = DMY()
 
 
+# Classes to build date with month name
+#   16/Oct/1995
+#   May-19-2006
+
 class _Day:
     """Second step of creating date object
 
-    Stores month and day numbers. If applied operator '/' or '-', returns BeautifulDate with provided value of the year
+    Stores month and day numbers. If applied operator '/' or '-', returns JBeautifulDate with provided value of the year
 
     Examples:
-        >>> 17/Dey/1380
-        BeautifulDate(1380, 10, 17)
+        >>> 12/Khr/1382
+        JBeautifulDate(1382, 3, 12)
 
         >>> Dey-17-1380
-        BeautifulDate(1380, 10, 17)
+        JBeautifulDate(1380, 10, 17)
 
     """
 
@@ -147,10 +148,7 @@ class _Day:
         self.m = m
 
     def __sub__(self, y):
-        return BeautifulDate(year=y, month=self.m, day=self.d)
-
-    def __repr__(self):
-        return "{}({}, {})".format(self.__class__.__name__, self.d, self.m)
+        return JBeautifulDate(year=y, month=self.m, day=self.d)
 
     __truediv__ = __sub__
 
@@ -161,8 +159,8 @@ class _Month:
     Stores month number. If applied operator '/' or '-', returns _Day with provided value of the day.
 
     Examples:
-        >>> 17/Dey
-        _Day(17, 10)
+        >>> 16/Oct
+        _Day(16, 10)
 
         >>> May-19
         _Day(19, 5)
@@ -177,21 +175,4 @@ class _Month:
     __rtruediv__ = __rsub__ = __truediv__ = __sub__
 
 
-M = _, Far, Ord, Kho, Tir, Mor, Sha, Meh, Aba, Aza, Dey, Bah, Esf = [
-    _Month(i) for i in range(13)
-]
-MFull = (
-    _,
-    Farvardin,
-    Ordibehesht,
-    Khordad,
-    Tir,
-    Mordad,
-    Shahrivar,
-    Mehr,
-    Aban,
-    Azar,
-    Dey,
-    Bahman,
-    Esfand,
-) = [_Month(i) for i in range(13)]
+M = _, Far, Ord, Khr, Tir, Mor, Sha, Mehr, Aban, Azar, Dey, Bah, Esf = [_Month(i) for i in range(13)]
